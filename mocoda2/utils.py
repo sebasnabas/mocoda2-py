@@ -62,12 +62,13 @@ def merge_participants(total_participants: list[Participant]):
     return participants
 
 def filter_participants(participants: list[Participant], age_groups: list[str],
-                        max_participants: int, no_of_messages: int):
+                        max_participants: int, max_messages: int, min_messages: int):
     distinct_participants = set(participants)
     filtered_participants = []
 
     for participant in distinct_participants:
-        if len(participant.messages) == 0 or participant.age_group not in age_groups:
+        messages = list(set(participant.messages))
+        if len(messages) < min_messages or participant.age_group not in age_groups:
             continue
 
         filtered_participants.append(
@@ -75,8 +76,8 @@ def filter_participants(participants: list[Participant], age_groups: list[str],
                 name=participant.name,
                 _id=participant._id,
                 age_group=participant.age_group,
-                messages=random.choices(participant.messages,
-                    k=min(len(participant.messages), no_of_messages)
+                messages=random.choices(messages,
+                    k=min(len(messages), max_messages)
                 )
             )
         )

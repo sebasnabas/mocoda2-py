@@ -76,8 +76,8 @@ def filter_participants(participants: list[Participant], age_groups: list[str],
                 name=participant.name,
                 _id=participant._id,
                 age_group=participant.age_group,
-                messages=random.choices(messages,
-                    k=min(len(messages), max_messages)
+                messages=random.sample(messages,
+                    min(len(messages), max_messages)
                 )
             )
         )

@@ -4,6 +4,8 @@ import dataclasses
 import getpass
 from pprint import pprint
 import requests
+import sys
+
 from mocoda2.utils import (
     BearerAuth,
     get_participants_with_messages,
@@ -44,7 +46,10 @@ def main():
 
     response = requests.post(url=LOGIN_ENDPOINT,
                              json={'username': args.username, 'password': password})
-    bearer_auth = BearerAuth(response.json()['accessToken'])
+    try:
+        bearer_auth = BearerAuth(response.json()['accessToken'])
+    except KeyError:
+        sys.exit('Password or username invalid')
 
     response = requests.post(url=SEARCH_ENDPOINT, json=search_params, auth=bearer_auth)
     results = response.json()['result']
@@ -87,4 +92,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

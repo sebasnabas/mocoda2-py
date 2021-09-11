@@ -1,6 +1,10 @@
+from csv import DictWriter
 import dataclasses
+import getpass
 import random
 import requests
+
+from mocoda2.definitions import LOGIN_ENDPOINT
 
 class BearerAuth(requests.auth.AuthBase):
     def __init__(self, token):
@@ -8,6 +12,22 @@ class BearerAuth(requests.auth.AuthBase):
     def __call__(self, r):
         r.headers["authorization"] = "Bearer " + self.token
         return r
+
+def login(username: str) -> BearerAuth:
+    password = getpass.getpass()
+
+    response = requests.post(url=LOGIN_ENDPOINT,
+                             json={'username': username, 'password': password})
+    try:
+        return BearerAuth(response.json()['accessToken'])
+    except KeyError as error:
+        raise ValueError('Password or username invalid') from error
+
+def write_to_csv(filename: str, data: list[dict], headers: list):
+    with open(filename, 'w') as csv_file:
+        writer = DictWriter(csv_file, fieldnames=headers)
+        writer.writeheader()
+        writer.writerows(data)
 
 @dataclasses.dataclass(frozen=True)
 class Participant:
@@ -19,7 +39,8 @@ class Participant:
     def __hash__(self):
         return hash(self._id)
 
-def get_participants_with_messages(chat_participants: list[dict], chat_messages: list[dict], age_groups: list[str]):
+def get_participants_with_messages(chat_participants: list[dict], chat_messages: list[dict],
+                                   age_groups: list[str]):
     participants = []
 
     for participant in chat_participants:

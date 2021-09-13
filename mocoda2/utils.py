@@ -1,6 +1,5 @@
 from csv import DictWriter, DictReader
 import dataclasses
-import getpass
 import random
 import requests
 
@@ -21,7 +20,7 @@ def login(username: str, password: str) -> BearerAuth:
     except KeyError as error:
         raise ValueError('Password or username invalid') from error
 
-def read_csv(filename: str) -> tuple(dict, list[dict]):
+def read_csv(filename: str) -> tuple[dict, list[dict]]:
     with open(filename, newline='') as csv_file:
         reader = DictReader(csv_file)
         rows = list(reader)

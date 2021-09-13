@@ -1,4 +1,4 @@
-from csv import DictWriter
+from csv import DictWriter, DictReader
 import dataclasses
 import getpass
 import random
@@ -13,15 +13,20 @@ class BearerAuth(requests.auth.AuthBase):
         r.headers["authorization"] = "Bearer " + self.token
         return r
 
-def login(username: str) -> BearerAuth:
-    password = getpass.getpass()
-
+def login(username: str, password: str) -> BearerAuth:
     response = requests.post(url=LOGIN_ENDPOINT,
                              json={'username': username, 'password': password})
     try:
         return BearerAuth(response.json()['accessToken'])
     except KeyError as error:
         raise ValueError('Password or username invalid') from error
+
+def read_csv(filename: str) -> tuple(dict, list[dict]):
+    with open(filename, newline='') as csv_file:
+        reader = DictReader(csv_file)
+        rows = list(reader)
+
+        return list(rows[0].keys()), rows
 
 def write_to_csv(filename: str, data: list[dict], headers: list):
     with open(filename, 'w') as csv_file:
@@ -40,7 +45,7 @@ class Participant:
         return hash(self._id)
 
 def get_participants_with_messages(chat_participants: list[dict], chat_messages: list[dict],
-                                   age_groups: list[str]):
+                                   age_groups: list[str]) -> list[Participant]:
     participants = []
 
     for participant in chat_participants:
@@ -67,7 +72,7 @@ def get_participants_with_messages(chat_participants: list[dict], chat_messages:
         )
     return participants
 
-def merge_participants(total_participants: list[Participant]):
+def merge_participants(total_participants: list[Participant]) -> list[Participant]:
     participants = []
 
     for i, participant in enumerate(total_participants):
@@ -83,7 +88,7 @@ def merge_participants(total_participants: list[Participant]):
     return participants
 
 def filter_participants(participants: list[Participant], age_groups: list[str],
-                        max_participants: int, max_messages: int, min_messages: int):
+                        max_participants: int, max_messages: int, min_messages: int) -> list[Participant]:
     distinct_participants = set(participants)
     filtered_participants = []
 

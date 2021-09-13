@@ -43,7 +43,7 @@ def parse_attribute(attribute_value, lang_keys: dict):
     except Exception:
         return attribute_value
 
-def update_csv(bearer_auth: BearerAuth, filenames: list[str], attributes: list[str]):
+def update_csv(bearer_auth: BearerAuth, filenames: list[str], attributes: list[str], inplace: bool):
     p_id_key = '_id'
     all_headers = []
     participants_per_file = []
@@ -56,6 +56,7 @@ def update_csv(bearer_auth: BearerAuth, filenames: list[str], attributes: list[s
         ids.extend([c[p_id_key] for c in content])
 
     lang_keys = get_translations(bearer_auth)
+    print('Downloading chats')
     chats = get_chats(bearer_auth)
     print('Downloaded chats')
     participants = {}
@@ -68,7 +69,7 @@ def update_csv(bearer_auth: BearerAuth, filenames: list[str], attributes: list[s
 
     for filename, headers, file_participants in zip(filenames, all_headers, participants_per_file):
         print(f"Updating {filename}")
-        updated_filename = f"{filename.rsplit('.', 1)[0]}_updated.csv"
+        updated_filename = f"{filename.rsplit('.', 1)[0]}_updated.csv" if not inplace else filename
         data=[]
         for file_participant in file_participants:
             participant_data = file_participant.copy()

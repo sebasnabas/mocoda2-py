@@ -26,6 +26,7 @@ def main():
 
     update_parser = subparsers.add_parser('update')
     update_parser.add_argument('filenames', type=str, nargs='+')
+    update_parser.add_argument('-i', '--inplace', action='store_true', help='Update files inplace')
     update_parser.add_argument('-a', '--attribute', action='extend', nargs='+',
                                choices=['motherlanguage', 'language', 'name', 'first', 'last'
                                         'age', 'city', 'education', 'gender', 'job',
@@ -49,7 +50,7 @@ def main():
                           bearer_auth)
 
     elif args.action == 'update':
-        update_csv(bearer_auth, args.filenames, args.attribute)
+        update_csv(bearer_auth, args.filenames, args.attribute, args.inplace)
 
 
 if __name__ == "__main__":
